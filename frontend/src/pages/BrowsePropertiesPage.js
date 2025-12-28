@@ -99,13 +99,49 @@ const BrowsePropertiesPage = () => {
                   <span className="badge badge-success">Available</span>
                 </div>
 
-                {/* Property Name */}
-                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-xs text-blue-600 font-medium mb-1">Building:</p>
-                  <p className="text-sm font-bold text-blue-900">{unit.property.address}</p>
-                  <p className="text-xs text-blue-700">
-                    📍 {unit.property.city}, {unit.property.state}
-                  </p>
+                {/* Property & Manager Info */}
+                <div className="mb-4 space-y-2">
+                  {/* Building Info */}
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-xs text-blue-600 font-medium mb-1">Building:</p>
+                    <p className="text-sm font-bold text-blue-900">{unit.property.address}</p>
+                    <p className="text-xs text-blue-700">
+                      📍 {unit.property.city}, {unit.property.state}
+                    </p>
+                    {unit.property.propertyType && (
+                      <p className="text-xs text-blue-600 mt-1 capitalize">
+                        Type: {unit.property.propertyType}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Property Manager Contact */}
+                  {unit.property.propertyManager && (
+                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <p className="text-xs text-green-600 font-medium mb-1">Property Manager:</p>
+                      <p className="text-sm font-bold text-green-900">
+                        {unit.property.propertyManager.name}
+                      </p>
+                      <div className="mt-2 space-y-1">
+                        {unit.property.propertyManager.email && (
+                          <a
+                            href={`mailto:${unit.property.propertyManager.email}`}
+                            className="text-xs text-green-700 hover:text-green-900 flex items-center gap-1 hover:underline"
+                          >
+                            📧 {unit.property.propertyManager.email}
+                          </a>
+                        )}
+                        {unit.property.propertyManager.phone && (
+                          <a
+                            href={`tel:${unit.property.propertyManager.phone}`}
+                            className="text-xs text-green-700 hover:text-green-900 flex items-center gap-1 hover:underline"
+                          >
+                            📞 {unit.property.propertyManager.phone}
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Unit Details */}

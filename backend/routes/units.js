@@ -7,6 +7,59 @@ const { protect, authorize } = require('../middleware/auth');
 const { updatePropertyStatus } = require('../utils/propertyStatus');
 
 /**
+ * @route   GET /api/units/browse
+ * @desc    Get all vacant units for browsing (tenants) - PUBLIC ROUTE
+ * @access  Public (anyone can browse)
+ */
+router.get('/browse', async (req, res, next) => {
+  try {
+    // Get all vacant units across all properties
+    const units = await Unit.find({ status: 'vacant' })
+      .populate({
+        path: 'property',
+        select: 'address city state propertyType description',
+        populate: {
+          path: 'propertyManager',
+          select: 'name email phone'
+        }
+      })
+      .sort('property address unitNumber');
+    
+    res.status(200).json({
+      success: true,
+      count: units.length,
+      units
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * @route   GET /api/units/property/:propertyId/vacant
+ * @desc    Get vacant units for a property
+ * @access  Private
+ */
+router.get('/property/:propertyId/vacant', protect, async (req, res, next) => {
+  try {
+    const units = await Unit.find({
+      property: req.params.propertyId,
+      status: 'vacant'
+    })
+      .populate('property', 'address city state')
+      .sort('unitNumber');
+    
+    res.status(200).json({
+      success: true,
+      count: units.length,
+      units
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
  * @route   GET /api/units/property/:propertyId
  * @desc    Get all units for a property
  * @access  Private
@@ -227,59 +280,6 @@ router.delete('/:id', protect, authorize('property_manager'), async (req, res, n
     res.status(200).json({
       success: true,
       message: 'Unit deleted successfully'
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * @route   GET /api/units/property/:propertyId/vacant
- * @desc    Get vacant units for a property
- * @access  Private
- */
-router.get('/property/:propertyId/vacant', protect, async (req, res, next) => {
-  try {
-    const units = await Unit.find({
-      property: req.params.propertyId,
-      status: 'vacant'
-    })
-      .populate('property', 'address city state')
-      .sort('unitNumber');
-    
-    res.status(200).json({
-      success: true,
-      count: units.length,
-      units
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * @route   GET /api/units/browse
- * @desc    Get all vacant units for browsing (tenants)
- * @access  Private
- */
-router.get('/browse', protect, async (req, res, next) => {
-  try {
-    // Get all vacant units across all properties
-    const units = await Unit.find({ status: 'vacant' })
-      .populate({
-        path: 'property',
-        select: 'address city state propertyType description',
-        populate: {
-          path: 'propertyManager',
-          select: 'name email phone'
-        }
-      })
-      .sort('property address unitNumber');
-    
-    res.status(200).json({
-      success: true,
-      count: units.length,
-      units
     });
   } catch (error) {
     next(error);
