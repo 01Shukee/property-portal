@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { applicationAPI } from '../services/api';
+import { motion } from 'framer-motion';
 import Navigation from '../components/Navigation';
 
 const ApplicationsPage = () => {
@@ -12,6 +13,7 @@ const ApplicationsPage = () => {
 
   useEffect(() => {
     loadApplications();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadApplications = async () => {
@@ -46,20 +48,20 @@ const ApplicationsPage = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'pending': return 'badge-warning';
-      case 'under_review': return 'badge-info';
-      case 'approved': return 'badge-success';
-      case 'rejected': return 'badge-danger';
-      case 'withdrawn': return 'badge-secondary';
-      default: return 'badge-secondary';
+      case 'pending': return 'bg-amber-100 text-amber-800 border-amber-200';
+      case 'under_review': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'approved': return 'bg-green-100 text-green-800 border-green-200';
+      case 'rejected': return 'bg-red-100 text-red-800 border-red-200';
+      case 'withdrawn': return 'bg-gray-100 text-gray-800 border-gray-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-white">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Loading applications...</p>
         </div>
       </div>
@@ -67,13 +69,17 @@ const ApplicationsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
       <Navigation />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-display font-bold text-gray-900 mb-2">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
             {isTenant ? 'My Applications' : 'Tenant Applications'}
           </h1>
           <p className="text-gray-600">
@@ -81,11 +87,15 @@ const ApplicationsPage = () => {
               ? 'Track your rental applications' 
               : 'Review and manage tenant applications'}
           </p>
-        </div>
+        </motion.div>
 
         {/* Applications List */}
         {applications.length === 0 ? (
-          <div className="card text-center py-12">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="card text-center py-12"
+          >
             <div className="text-6xl mb-4">📝</div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">
               No Applications Yet
@@ -95,23 +105,29 @@ const ApplicationsPage = () => {
                 ? 'Start browsing properties to submit your first application' 
                 : 'No applications to review at this time'}
             </p>
-          </div>
+          </motion.div>
         ) : (
           <div className="space-y-4">
-            {applications.map((application) => (
-              <div key={application._id} className="card">
+            {applications.map((application, index) => (
+              <motion.div
+                key={application._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-lg transition-all"
+              >
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between">
                   <div className="flex-1 mb-4 md:mb-0">
                     {/* Header */}
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-2 mb-3 flex-wrap">
                       <h3 className="text-xl font-bold text-gray-900">
                         Unit {application.unit?.unitNumber} - {application.property?.address}
                       </h3>
-                      <span className={`badge ${getStatusColor(application.status)}`}>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(application.status)}`}>
                         {application.status.replace('_', ' ')}
                       </span>
                       {application.blockedFromProperty && (
-                        <span className="badge badge-danger">
+                        <span className="px-3 py-1 bg-red-100 text-red-800 border border-red-200 rounded-full text-xs font-medium">
                           🚫 Blocked
                         </span>
                       )}
@@ -122,7 +138,7 @@ const ApplicationsPage = () => {
                     </p>
 
                     {/* Unit Details */}
-                    <div className="mb-3 p-3 bg-blue-50 rounded-lg">
+                    <div className="mb-3 p-3 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
                       <p className="text-sm text-blue-800 capitalize">
                         <strong>Unit Type:</strong> {application.unit?.unitType}
                       </p>
@@ -133,7 +149,7 @@ const ApplicationsPage = () => {
 
                     {/* Applicant Info (for PM/Homeowner) */}
                     {!isTenant && application.tenant && (
-                      <div className="mb-3 p-3 bg-gray-50 rounded-lg">
+                      <div className="mb-3 p-3 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
                         <p className="text-sm font-medium text-gray-900 mb-2">
                           👤 Applicant: {application.tenant.name}
                         </p>
@@ -167,7 +183,7 @@ const ApplicationsPage = () => {
 
                     {/* Employment Info */}
                     {application.employment && (
-                      <div className="mb-3 p-3 bg-green-50 rounded-lg">
+                      <div className="mb-3 p-3 bg-gradient-to-br from-green-50 to-emerald-100 rounded-xl border border-green-200">
                         <p className="text-sm text-green-800 capitalize">
                           <strong>Employment:</strong> {application.employment.status.replace('_', ' ')}
                           {application.employment.company && ` at ${application.employment.company}`}
@@ -182,7 +198,7 @@ const ApplicationsPage = () => {
 
                     {/* Review Info */}
                     {application.reviewedAt && (
-                      <div className="mt-3 p-3 bg-gray-50 rounded-lg">
+                      <div className="mt-3 p-3 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
                         <p className="text-sm text-gray-700 mb-1">
                           <strong>Reviewed on:</strong> {new Date(application.reviewedAt).toLocaleDateString()}
                           {application.reviewedBy && ` by ${application.reviewedBy.name}`}
@@ -210,26 +226,30 @@ const ApplicationsPage = () => {
                   <div className="md:ml-4 flex flex-col gap-2 md:min-w-[150px]">
                     {/* PM/Homeowner Actions */}
                     {(isPropertyManager || isHomeowner) && ['pending', 'under_review'].includes(application.status) && (
-                      <button
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => handleReview(application)}
-                        className="btn btn-primary text-sm whitespace-nowrap"
+                        className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-medium hover:shadow-lg transition-all text-sm whitespace-nowrap"
                       >
                         Review Application
-                      </button>
+                      </motion.button>
                     )}
 
                     {/* Tenant Actions */}
                     {isTenant && ['pending', 'under_review'].includes(application.status) && (
-                      <button
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={() => handleWithdraw(application._id)}
-                        className="btn btn-secondary text-sm whitespace-nowrap"
+                        className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full font-medium hover:shadow-lg transition-all text-sm whitespace-nowrap"
                       >
                         Withdraw
-                      </button>
+                      </motion.button>
                     )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
@@ -254,7 +274,7 @@ const ApplicationsPage = () => {
   );
 };
 
-// Review Application Modal Component with Block Feature
+// Review Application Modal Component
 const ReviewApplicationModal = ({ application, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     status: 'under_review',
@@ -278,7 +298,6 @@ const ReviewApplicationModal = ({ application, onClose, onSuccess }) => {
     setLoading(true);
     setError('');
 
-    // Validation
     if (formData.status === 'rejected' && formData.blockTenant && !formData.blockReason.trim()) {
       setError('Please provide a reason for blocking this tenant');
       setLoading(false);
@@ -310,10 +329,14 @@ const ReviewApplicationModal = ({ application, onClose, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+      >
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-display font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-gray-900">
               Review Application
             </h2>
             <button
@@ -325,7 +348,7 @@ const ReviewApplicationModal = ({ application, onClose, onSuccess }) => {
           </div>
 
           {/* Application Summary */}
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+          <div className="mb-6 p-4 bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl">
             <p className="text-blue-800 font-medium mb-1">Applicant:</p>
             <p className="text-blue-900 font-bold">{application.tenant?.name}</p>
             <p className="text-blue-700 text-sm">
@@ -341,7 +364,7 @@ const ReviewApplicationModal = ({ application, onClose, onSuccess }) => {
 
           {/* Warning for Approval */}
           {formData.status === 'approved' && (
-            <div className="mb-4 p-4 bg-green-50 border-2 border-green-300 rounded-xl">
+            <div className="mb-4 p-4 bg-gradient-to-br from-green-50 to-emerald-100 border-2 border-green-300 rounded-xl">
               <p className="text-green-800 font-medium mb-2">✅ Approving this application will:</p>
               <ul className="text-sm text-green-700 space-y-1 ml-4">
                 <li>• Create an active lease for this tenant</li>
@@ -354,7 +377,7 @@ const ReviewApplicationModal = ({ application, onClose, onSuccess }) => {
 
           {/* Warning for Rejection with Block */}
           {formData.status === 'rejected' && formData.blockTenant && (
-            <div className="mb-4 p-4 bg-red-50 border-2 border-red-300 rounded-xl">
+            <div className="mb-4 p-4 bg-gradient-to-br from-red-50 to-red-100 border-2 border-red-300 rounded-xl">
               <p className="text-red-800 font-medium mb-2">🚫 Blocking this tenant will:</p>
               <ul className="text-sm text-red-700 space-y-1 ml-4">
                 <li>• Prevent them from applying to ANY unit in this property</li>
@@ -393,9 +416,9 @@ const ReviewApplicationModal = ({ application, onClose, onSuccess }) => {
               ></textarea>
             </div>
 
-            {/* Block Tenant Option (only show if rejecting) */}
+            {/* Block Tenant Option */}
             {formData.status === 'rejected' && (
-              <div className="p-4 border-2 border-red-200 bg-red-50 rounded-xl">
+              <div className="p-4 border-2 border-red-200 bg-gradient-to-br from-red-50 to-red-100 rounded-xl">
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
                     type="checkbox"
@@ -438,19 +461,19 @@ const ReviewApplicationModal = ({ application, onClose, onSuccess }) => {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 btn btn-secondary"
+                className="flex-1 px-6 py-3 bg-white border-2 border-gray-900 text-gray-900 rounded-full font-medium hover:bg-gray-50 transition-all"
               >
                 Cancel
               </button>
               <button 
                 type="submit" 
                 disabled={loading} 
-                className={`flex-1 btn ${
+                className={`flex-1 px-6 py-3 rounded-full font-medium text-white transition-all ${
                   formData.status === 'approved' 
-                    ? 'btn-primary bg-green-600 hover:bg-green-700' 
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:shadow-lg' 
                     : formData.status === 'rejected'
-                    ? 'btn-primary bg-red-600 hover:bg-red-700'
-                    : 'btn-primary'
+                    ? 'bg-gradient-to-r from-red-500 to-red-600 hover:shadow-lg'
+                    : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:shadow-lg'
                 }`}
               >
                 {loading ? 'Processing...' : 'Submit Review'}
@@ -458,7 +481,7 @@ const ReviewApplicationModal = ({ application, onClose, onSuccess }) => {
             </div>
           </form>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

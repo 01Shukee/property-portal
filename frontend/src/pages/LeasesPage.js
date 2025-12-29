@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { leaseAPI, maintenanceAPI, paymentAPI, propertyAPI, activityAPI } from '../services/api';
+import { leaseAPI, maintenanceAPI, paymentAPI } from '../services/api';
+import { motion } from 'framer-motion';
 import Navigation from '../components/Navigation';
 import PropertyTabbedView from '../components/PropertyTabbedView';
 
@@ -11,12 +12,9 @@ const LeasesPage = () => {
   const [selectedLease, setSelectedLease] = useState(null);
   const [showTerminateModal, setShowTerminateModal] = useState(false);
 
-  // For tenant actions
-  const [showMaintenanceModal, setShowMaintenanceModal] = useState(false);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-
   useEffect(() => {
     loadLeases();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadLeases = async () => {
@@ -37,11 +35,11 @@ const LeasesPage = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'active': return 'badge-success';
-      case 'expired': return 'badge-warning';
-      case 'terminated': return 'badge-danger';
-      case 'renewed': return 'badge-info';
-      default: return 'badge-secondary';
+      case 'active': return 'bg-green-100 text-green-800 border-green-200';
+      case 'expired': return 'bg-amber-100 text-amber-800 border-amber-200';
+      case 'terminated': return 'bg-red-100 text-red-800 border-red-200';
+      case 'renewed': return 'bg-blue-100 text-blue-800 border-blue-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
@@ -52,25 +50,29 @@ const LeasesPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-white">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading leases...</p>
         </div>
       </div>
     );
   }
 
-  // UPDATED TENANT VIEW - With Activity Feed
+  // TENANT VIEW
   if (isTenant) {
     const activeLease = leases.find(l => l.status === 'active');
 
     if (!activeLease) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
           <Navigation />
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="card text-center py-12">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="card text-center py-12"
+            >
               <div className="text-6xl mb-4">🏠</div>
               <h3 className="text-2xl font-bold text-gray-900 mb-2">
                 No Active Lease
@@ -78,13 +80,15 @@ const LeasesPage = () => {
               <p className="text-gray-600 mb-6">
                 You don't have an active lease yet. Browse properties to apply!
               </p>
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => window.location.href = '/browse-properties'}
-                className="btn btn-primary"
+                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-medium hover:shadow-lg transition-all"
               >
                 Browse Properties
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           </div>
         </div>
       );
@@ -95,23 +99,31 @@ const LeasesPage = () => {
 
   // PROPERTY MANAGER / HOMEOWNER VIEW
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
       <Navigation />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-display font-bold text-gray-900 mb-2">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
             Lease Agreements
           </h1>
           <p className="text-gray-600">
             Manage all active and past leases
           </p>
-        </div>
+        </motion.div>
 
         {/* Leases List */}
         {leases.length === 0 ? (
-          <div className="card text-center py-12">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="card text-center py-12"
+          >
             <div className="text-6xl mb-4">📄</div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">
               No Leases Yet
@@ -119,27 +131,33 @@ const LeasesPage = () => {
             <p className="text-gray-600">
               No active leases at the moment
             </p>
-          </div>
+          </motion.div>
         ) : (
           <div className="space-y-4">
-            {leases.map((lease) => {
+            {leases.map((lease, index) => {
               const daysRemaining = getDaysRemaining(lease.endDate);
               const isExpiringSoon = daysRemaining > 0 && daysRemaining <= 30;
 
               return (
-                <div key={lease._id} className="card">
+                <motion.div
+                  key={lease._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="bg-white rounded-2xl p-6 border border-gray-100 hover:shadow-lg transition-all"
+                >
                   <div className="flex flex-col md:flex-row md:items-start md:justify-between">
                     <div className="flex-1 mb-4 md:mb-0">
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-2 mb-3 flex-wrap">
                         <h3 className="text-xl font-bold text-gray-900">
                           {lease.property?.address}
                         </h3>
-                        <span className={`badge ${getStatusColor(lease.status)}`}>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(lease.status)}`}>
                           {lease.status}
                         </span>
                         {isExpiringSoon && lease.status === 'active' && (
-                          <span className="badge badge-warning">
-                            Expiring Soon
+                          <span className="px-3 py-1 bg-amber-100 text-amber-800 border border-amber-200 rounded-full text-xs font-medium">
+                            ⏰ Expiring Soon
                           </span>
                         )}
                       </div>
@@ -148,7 +166,7 @@ const LeasesPage = () => {
                       </p>
 
                       {lease.tenant && (
-                        <div className="mb-3 p-3 bg-gray-50 rounded-lg">
+                        <div className="mb-3 p-3 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
                           <p className="text-sm font-medium text-gray-900">
                             👤 Tenant: {lease.tenant.name}
                           </p>
@@ -186,15 +204,15 @@ const LeasesPage = () => {
                       </div>
 
                       {lease.status === 'active' && daysRemaining > 0 && (
-                        <div className={`p-3 rounded-lg ${isExpiringSoon ? 'bg-yellow-50 border border-yellow-200' : 'bg-blue-50 border border-blue-200'}`}>
-                          <p className={`text-sm font-medium ${isExpiringSoon ? 'text-yellow-800' : 'text-blue-800'}`}>
+                        <div className={`p-3 rounded-xl border ${isExpiringSoon ? 'bg-gradient-to-br from-amber-50 to-orange-100 border-amber-200' : 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200'}`}>
+                          <p className={`text-sm font-medium ${isExpiringSoon ? 'text-amber-800' : 'text-blue-800'}`}>
                             {daysRemaining} days remaining
                           </p>
                         </div>
                       )}
 
                       {lease.terminatedAt && (
-                        <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <div className="mt-3 p-3 bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-xl">
                           <p className="text-sm font-medium text-red-800 mb-1">
                             Terminated on {new Date(lease.terminatedAt).toLocaleDateString()}
                           </p>
@@ -208,16 +226,18 @@ const LeasesPage = () => {
                     {/* Actions */}
                     {(isPropertyManager || isHomeowner) && lease.status === 'active' && (
                       <div className="md:ml-4">
-                        <button
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                           onClick={() => handleTerminate(lease)}
-                          className="btn btn-secondary text-sm whitespace-nowrap"
+                          className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full font-medium hover:shadow-lg transition-all text-sm whitespace-nowrap"
                         >
                           Terminate Lease
-                        </button>
+                        </motion.button>
                       </div>
                     )}
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
@@ -243,44 +263,52 @@ const LeasesPage = () => {
   );
 };
 
-// Tenant Lease View with Activity Feed
+// Tenant Lease View
 const TenantLeaseView = ({ lease }) => {
   const [showMaintenanceModal, setShowMaintenanceModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
       <Navigation />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-display font-bold text-gray-900 mb-2">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8"
+        >
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
             My Rental 🏠
           </h1>
           <p className="text-gray-600">
             Everything you need in one place
           </p>
-        </div>
+        </motion.div>
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-2 gap-4 mb-6">
-          <button
+          <motion.button
+            whileHover={{ y: -5, scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowPaymentModal(true)}
-            className="p-6 border-2 border-green-200 bg-green-50 hover:bg-green-100 rounded-xl transition-all text-left"
+            className="p-6 bg-gradient-to-br from-green-500 to-emerald-600 hover:shadow-xl rounded-2xl transition-all text-left text-white"
           >
             <div className="text-4xl mb-3">💳</div>
-            <h4 className="font-bold text-gray-900 mb-1">Pay Rent</h4>
-            <p className="text-sm text-gray-600">Make a payment quickly</p>
-          </button>
+            <h4 className="font-bold text-lg mb-1">Pay Rent</h4>
+            <p className="text-sm text-green-100">Make a payment quickly</p>
+          </motion.button>
 
-          <button
+          <motion.button
+            whileHover={{ y: -5, scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setShowMaintenanceModal(true)}
-            className="p-6 border-2 border-blue-200 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all text-left"
+            className="p-6 bg-gradient-to-br from-blue-600 to-purple-600 hover:shadow-xl rounded-2xl transition-all text-left text-white"
           >
             <div className="text-4xl mb-3">🔧</div>
-            <h4 className="font-bold text-gray-900 mb-1">Report Issue</h4>
-            <p className="text-sm text-gray-600">Submit maintenance request</p>
-          </button>
+            <h4 className="font-bold text-lg mb-1">Report Issue</h4>
+            <p className="text-sm text-blue-100">Submit maintenance request</p>
+          </motion.button>
         </div>
 
         {/* Tabbed Property View */}
@@ -309,7 +337,7 @@ const TenantLeaseView = ({ lease }) => {
   );
 };
 
-// Maintenance Modal for Tenants
+// Maintenance Modal
 const MaintenanceModal = ({ lease, onClose }) => {
   const [formData, setFormData] = useState({
     property: lease.property._id,
@@ -347,10 +375,14 @@ const MaintenanceModal = ({ lease, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+      >
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-display font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-gray-900">
               Report Maintenance Issue
             </h2>
             <button
@@ -361,7 +393,7 @@ const MaintenanceModal = ({ lease, onClose }) => {
             </button>
           </div>
 
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+          <div className="mb-6 p-4 bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl">
             <p className="text-blue-800 font-medium">Property:</p>
             <p className="text-blue-900 font-bold">{lease.property.address}</p>
           </div>
@@ -440,22 +472,26 @@ const MaintenanceModal = ({ lease, onClose }) => {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 btn btn-secondary"
+                className="flex-1 px-6 py-3 bg-white border-2 border-gray-900 text-gray-900 rounded-full font-medium hover:bg-gray-50 transition-all"
               >
                 Cancel
               </button>
-              <button type="submit" disabled={loading} className="flex-1 btn btn-primary">
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-medium hover:shadow-lg transition-all"
+              >
                 {loading ? 'Submitting...' : 'Submit Request'}
               </button>
             </div>
           </form>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
 
-// Payment Modal Component - UPDATED with better error handling
+// Payment Modal
 const PaymentModal = ({ lease, onClose }) => {
   const monthlyRent = lease.monthlyRent;
   const sixMonthRent = monthlyRent * 6;
@@ -476,42 +512,24 @@ const PaymentModal = ({ lease, onClose }) => {
 
     try {
       const amount = getAmount();
-      console.log('💰 Amount to pay:', amount);
-      console.log('📤 Calling paymentAPI.initiate...');
-      
       const response = await paymentAPI.initiate({
         amount,
         paymentType: 'rent',
         paymentFor: 'rent'
       });
 
-      console.log('✅ Response received:', response);
-
-      // Redirect to Flutterwave
       if (response.paymentUrl) {
-        console.log('🔗 Redirecting to:', response.paymentUrl);
         window.location.href = response.paymentUrl;
       } else {
-        console.error('❌ No paymentUrl in response');
         setError('Payment URL not received. Please try again.');
         setLoading(false);
       }
     } catch (err) {
-      console.error('❌ Error details:', err);
-      console.error('❌ Response data:', err.response?.data);
-      
-      // Show detailed error
-      if (err.response?.data) {
-        const errorData = err.response.data;
-        if (errorData.error?.message) {
-          setError(`Error: ${errorData.error.message}`);
-        } else if (errorData.message) {
-          setError(`Error: ${errorData.message}`);
-        } else {
-          setError('Payment failed. Please try again.');
-        }
-      } else if (err.message) {
-        setError(`Error: ${err.message}`);
+      const errorData = err.response?.data;
+      if (errorData?.error?.message) {
+        setError(`Error: ${errorData.error.message}`);
+      } else if (errorData?.message) {
+        setError(`Error: ${errorData.message}`);
       } else {
         setError('Failed to initiate payment. Please try again.');
       }
@@ -521,10 +539,14 @@ const PaymentModal = ({ lease, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white rounded-2xl max-w-md w-full"
+      >
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-display font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-gray-900">
               💳 Pay Rent
             </h2>
             <button
@@ -535,8 +557,7 @@ const PaymentModal = ({ lease, onClose }) => {
             </button>
           </div>
 
-          {/* Property Info */}
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+          <div className="mb-6 p-4 bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl">
             <p className="text-blue-800 font-medium mb-1">Your Rental</p>
             <p className="text-blue-900 font-bold">{lease.property.address}</p>
             <p className="text-blue-700 text-sm">
@@ -551,9 +572,6 @@ const PaymentModal = ({ lease, onClose }) => {
             <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600">
               <p className="font-medium mb-1">Payment Error</p>
               <p className="text-sm">{error}</p>
-              <p className="text-xs mt-2">
-                💡 Make sure your backend server is running and has the correct Flutterwave API key.
-              </p>
             </div>
           )}
 
@@ -561,10 +579,10 @@ const PaymentModal = ({ lease, onClose }) => {
             <div>
               <label className="label">Select Payment Duration</label>
               
-              {/* 6 Months Option */}
-              <label className="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:bg-gray-50 mb-3"
+              <label
+                className="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:bg-gray-50 mb-3 transition-all"
                 style={{
-                  borderColor: paymentOption === '6months' ? '#667eea' : '#e5e7eb'
+                  borderColor: paymentOption === '6months' ? '#3b82f6' : '#e5e7eb'
                 }}
               >
                 <input
@@ -573,12 +591,12 @@ const PaymentModal = ({ lease, onClose }) => {
                   value="6months"
                   checked={paymentOption === '6months'}
                   onChange={(e) => setPaymentOption(e.target.value)}
-                  className="w-5 h-5 text-primary-600"
+                  className="w-5 h-5"
                 />
                 <div className="ml-3 flex-1">
                   <div className="flex justify-between items-center">
                     <span className="font-bold text-gray-900">6 Months</span>
-                    <span className="text-xl font-bold text-primary-600">
+                    <span className="text-xl font-bold text-blue-600">
                       ₦{sixMonthRent.toLocaleString()}
                     </span>
                   </div>
@@ -588,10 +606,10 @@ const PaymentModal = ({ lease, onClose }) => {
                 </div>
               </label>
 
-              {/* 1 Year Option */}
-              <label className="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:bg-gray-50"
+              <label
+                className="flex items-center p-4 border-2 rounded-xl cursor-pointer hover:bg-gray-50 transition-all"
                 style={{
-                  borderColor: paymentOption === '1year' ? '#667eea' : '#e5e7eb'
+                  borderColor: paymentOption === '1year' ? '#3b82f6' : '#e5e7eb'
                 }}
               >
                 <input
@@ -600,12 +618,12 @@ const PaymentModal = ({ lease, onClose }) => {
                   value="1year"
                   checked={paymentOption === '1year'}
                   onChange={(e) => setPaymentOption(e.target.value)}
-                  className="w-5 h-5 text-primary-600"
+                  className="w-5 h-5"
                 />
                 <div className="ml-3 flex-1">
                   <div className="flex justify-between items-center">
                     <span className="font-bold text-gray-900">1 Year</span>
-                    <span className="text-xl font-bold text-primary-600">
+                    <span className="text-xl font-bold text-blue-600">
                       ₦{oneYearRent.toLocaleString()}
                     </span>
                   </div>
@@ -619,7 +637,7 @@ const PaymentModal = ({ lease, onClose }) => {
               </label>
             </div>
 
-            <div className="p-4 bg-purple-50 border border-purple-200 rounded-xl">
+            <div className="p-4 bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-xl">
               <p className="text-sm text-purple-800">
                 <strong>💡 Payment Info:</strong> You'll be redirected to Flutterwave to complete your payment securely.
               </p>
@@ -629,14 +647,14 @@ const PaymentModal = ({ lease, onClose }) => {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 btn btn-secondary"
+                className="flex-1 px-6 py-3 bg-white border-2 border-gray-900 text-gray-900 rounded-full font-medium hover:bg-gray-50 transition-all"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 btn btn-primary"
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full font-medium hover:shadow-lg transition-all"
               >
                 {loading ? (
                   <>
@@ -650,12 +668,12 @@ const PaymentModal = ({ lease, onClose }) => {
             </div>
           </form>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
 
-// Terminate Lease Modal (for PM/Homeowner)
+// Terminate Lease Modal
 const TerminateLeaseModal = ({ lease, onClose, onSuccess }) => {
   const [terminationReason, setTerminationReason] = useState('');
   const [loading, setLoading] = useState(false);
@@ -679,10 +697,14 @@ const TerminateLeaseModal = ({ lease, onClose, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white rounded-2xl max-w-md w-full"
+      >
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-display font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-gray-900">
               Terminate Lease
             </h2>
             <button
@@ -693,7 +715,7 @@ const TerminateLeaseModal = ({ lease, onClose, onSuccess }) => {
             </button>
           </div>
 
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+          <div className="mb-6 p-4 bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-xl">
             <p className="text-red-800 text-sm font-medium mb-2">⚠️ Warning</p>
             <p className="text-red-700 text-sm">
               This will end the lease and mark the property as vacant.
@@ -723,7 +745,7 @@ const TerminateLeaseModal = ({ lease, onClose, onSuccess }) => {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 btn btn-secondary"
+                className="flex-1 px-6 py-3 bg-white border-2 border-gray-900 text-gray-900 rounded-full font-medium hover:bg-gray-50 transition-all"
                 disabled={loading}
               >
                 Cancel
@@ -731,14 +753,14 @@ const TerminateLeaseModal = ({ lease, onClose, onSuccess }) => {
               <button 
                 type="submit" 
                 disabled={loading} 
-                className="flex-1 btn btn-primary bg-red-600 hover:bg-red-700"
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full font-medium hover:shadow-lg transition-all"
               >
                 {loading ? 'Terminating...' : 'Terminate'}
               </button>
             </div>
           </form>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
