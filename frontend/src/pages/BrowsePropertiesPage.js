@@ -26,6 +26,14 @@ const BrowsePropertiesPage = () => {
   };
 
   const handleApply = (unit) => {
+    // Check if user is logged in
+    if (!user) {
+      // Redirect to login with message
+      alert('Please login or register to apply for this unit');
+      window.location.href = '/login';
+      return;
+    }
+    
     setSelectedUnit(unit);
     setShowApplicationModal(true);
   };

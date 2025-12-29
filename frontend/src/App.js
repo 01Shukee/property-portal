@@ -8,8 +8,8 @@ import DashboardPage from './pages/DashboardPage';
 import PropertiesPage from './pages/PropertiesPage';
 import BrowsePropertiesPage from './pages/BrowsePropertiesPage';
 import MaintenancePage from './pages/MaintenancePage';
-import HomeownersPage from './pages/HomeownersPage'; // ADD THIS IMPORT
-import AcceptInvitationPage from './pages/AcceptInvitationPage'; // ADD THIS IMPORT
+import HomeownersPage from './pages/HomeownersPage';
+import AcceptInvitationPage from './pages/AcceptInvitationPage';
 import AnnouncementsPage from './pages/AnnouncementsPage';
 import PaymentsPage from './pages/PaymentsPage';
 import PaymentCallbackPage from './pages/PaymentCallbackPage';
@@ -60,6 +60,13 @@ function AppRoutes() {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<LandingPage />} />
+      
+      {/* Browse Properties - PUBLIC (no login required to view) */}
+      <Route path="/browse-properties" element={<BrowsePropertiesPage />} />
+
+      {/* Public Invitation Routes */}
+      <Route path="/accept-invitation/:token" element={<AcceptInvitationPage />} />
+      <Route path="/accept-tenant-invitation/:token" element={<AcceptTenantInvitationPage />} />
 
       {/* Guest Routes (only accessible when not logged in) */}
       <Route
@@ -93,14 +100,6 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <PropertiesPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/browse-properties"
-        element={
-          <ProtectedRoute>
-            <BrowsePropertiesPage />
           </ProtectedRoute>
         }
       />
@@ -176,14 +175,6 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/accept-tenant-invitation/:token"
-        element={<AcceptTenantInvitationPage />}
-      />
-
-
-      {/* Public Invitation Route */}
-      <Route path="/accept-invitation/:token" element={<AcceptInvitationPage />} />
 
       {/* 404 - Redirect to home */}
       <Route path="*" element={<Navigate to="/" />} />
