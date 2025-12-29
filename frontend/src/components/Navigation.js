@@ -97,7 +97,7 @@ const Navigation = () => {
             <img 
               src="/logo.png" 
               alt="PropertyHub Logo" 
-              className="h-32 w-auto"
+              className="h-12 w-auto"
             />
           </motion.div>
 

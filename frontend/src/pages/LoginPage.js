@@ -44,14 +44,17 @@ const LoginPage = () => {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md animate-fade-in">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 mb-8">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center text-white text-xl font-bold shadow-lg">
-              P
-            </div>
-            <span className="text-2xl font-display font-bold bg-gradient-to-r from-primary-700 to-primary-900 bg-clip-text text-transparent">
-              PropertyHub
-            </span>
-          </Link>
+          <div
+            whileHover={{ scale: 1.05 }}
+            onClick={() => navigate('/dashboard')}
+            className="cursor-pointer"
+          >
+            <img 
+              src="/logo.png" 
+              alt="PropertyHub Logo" 
+              className="h-24 w-auto"
+            />
+          </div>
 
           {/* Header */}
           <div className="mb-8">

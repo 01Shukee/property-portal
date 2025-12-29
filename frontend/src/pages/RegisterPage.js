@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 const RegisterPage = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
-  
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -15,7 +15,7 @@ const RegisterPage = () => {
     role: '',
     address: '',
   });
-  
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -77,13 +77,13 @@ const RegisterPage = () => {
     // Remove confirmPassword before sending
     const { confirmPassword, ...userData } = formData;
     const result = await register(userData);
-    
+
     if (result.success) {
       navigate('/dashboard');
     } else {
       setError(result.message);
     }
-    
+
     setLoading(false);
   };
 
@@ -91,14 +91,18 @@ const RegisterPage = () => {
     <div className="min-h-screen flex items-center justify-center p-4 py-12">
       <div className="w-full max-w-4xl animate-fade-in">
         {/* Logo */}
-        <Link to="/" className="flex items-center justify-center space-x-2 mb-8">
-          <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center text-white text-xl font-bold shadow-lg">
-            P
-          </div>
-          <span className="text-2xl font-display font-bold bg-gradient-to-r from-primary-700 to-primary-900 bg-clip-text text-transparent">
-            PropertyHub
-          </span>
-        </Link>
+        <div 
+          
+          whileHover={{ scale: 1.05 }}
+          onClick={() => navigate('/dashboard')}
+          className="cursor-pointer flex items-center justify-center space-x-2 mb-8" 
+        >
+          <img
+            src="/logo.png"
+            alt="PropertyHub Logo"
+            className="h-32 w-auto"
+          />
+        </div>
 
         {/* Header */}
         <div className="text-center mb-8">
@@ -128,11 +132,10 @@ const RegisterPage = () => {
                     key={role.value}
                     type="button"
                     onClick={() => handleRoleSelect(role.value)}
-                    className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
-                      formData.role === role.value
+                    className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${formData.role === role.value
                         ? 'border-primary-500 bg-primary-50 shadow-lg scale-105'
                         : 'border-gray-200 hover:border-primary-300 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     <div className="text-3xl mb-2">{role.icon}</div>
                     <h3 className="font-semibold text-gray-900 mb-1">{role.title}</h3>
