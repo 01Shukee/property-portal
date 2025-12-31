@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
@@ -19,7 +20,7 @@ const LoginPage = () => {
       ...formData,
       [e.target.name]: e.target.value,
     });
-    setError(''); // Clear error when user types
+    setError('');
   };
 
   const handleSubmit = async (e) => {
@@ -39,82 +40,100 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-gray-50">
       {/* Left Side - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-md animate-fade-in">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="w-full max-w-md"
+        >
           {/* Logo */}
-          <div
-            whileHover={{ scale: 1.05 }}
-            onClick={() => navigate('/dashboard')}
-            className="cursor-pointer"
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            onClick={() => navigate('/')}
+            className="cursor-pointer mb-12"
           >
             <img 
-              src="/logo.png" 
+              src="/logo (1).png" 
               alt="PropertyHub Logo" 
-              className="h-24 w-auto"
+              className="h-12 w-auto"
             />
-          </div>
+          </motion.div>
 
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-4xl font-display font-bold text-gray-900 mb-2">
-              Welcome Back
+            <h1 className="text-3xl font-semibold text-gray-900 mb-2">
+              Sign In
             </h1>
             <p className="text-gray-600">
-              Sign in to access your property management dashboard
+              Access your account
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 animate-slide-down">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-sm"
+            >
               {error}
-            </div>
+            </motion.div>
           )}
 
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="label">Email Address</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="input"
-                placeholder="you@example.com"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all"
+                placeholder="you@company.com"
                 required
               />
             </div>
 
             <div>
-              <label className="label">Password</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
               <input
                 type="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="input"
-                placeholder="••••••••"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all"
+                placeholder="Enter your password"
                 required
               />
             </div>
 
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center space-x-2 cursor-pointer">
-                <input type="checkbox" className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
-                <span className="text-gray-600">Remember me</span>
+                <input 
+                  type="checkbox" 
+                  className="rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+                />
+                <span className="text-gray-600">Keep me signed in</span>
               </label>
-              <a href="#" className="text-primary-600 hover:text-primary-700 font-medium">
+              <a href="#" className="text-gray-900 hover:text-gray-700 font-medium">
                 Forgot password?
               </a>
             </div>
 
-            <button
+            <motion.button
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
               type="submit"
               disabled={loading}
-              className="w-full btn btn-primary text-lg"
+              className="w-full bg-gray-900 hover:bg-gray-800 text-white py-3 rounded-lg font-medium transition-colors"
             >
               {loading ? (
                 <span className="flex items-center justify-center">
@@ -127,46 +146,103 @@ const LoginPage = () => {
               ) : (
                 'Sign In'
               )}
-            </button>
+            </motion.button>
           </form>
 
-          {/* Sign Up Link */}
-          <p className="mt-8 text-center text-gray-600">
-            Don't have an account?{' '}
-            <Link to="/register" className="text-primary-600 hover:text-primary-700 font-semibold">
-              Sign up for free
-            </Link>
-          </p>
-        </div>
-      </div>
-
-      {/* Right Side - Illustration */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-500 to-primary-800 p-12 items-center justify-center relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -mr-48 -mt-48"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/10 rounded-full -ml-48 -mb-48"></div>
-        
-        <div className="relative z-10 text-white max-w-md">
-          <h2 className="text-4xl font-display font-bold mb-6">
-            Manage Properties Like a Pro
-          </h2>
-          <p className="text-xl opacity-90 mb-8">
-            Track payments, handle maintenance, communicate with tenants - all in one powerful platform.
-          </p>
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">✓</div>
-              <span>Real-time payment tracking</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">✓</div>
-              <span>Automated notifications</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">✓</div>
-              <span>Comprehensive reporting</span>
+          {/* Divider */}
+          <div className="mt-8 mb-8">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white text-gray-500">New to PropertyHub?</span>
+              </div>
             </div>
           </div>
-        </div>
+
+          {/* Sign Up Link */}
+          <Link 
+            to="/register" 
+            className="block w-full text-center py-3 border-2 border-gray-900 text-gray-900 rounded-lg font-medium hover:bg-gray-900 hover:text-white transition-all"
+          >
+            Create an Account
+          </Link>
+        </motion.div>
+      </div>
+
+      {/* Right Side - Professional Info Panel */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gray-900 items-center justify-center p-12">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          className="max-w-lg"
+        >
+          <div className="mb-12">
+            <h2 className="text-4xl font-semibold text-white mb-4 leading-tight">
+              Professional Property Management Platform
+            </h2>
+            <p className="text-gray-300 text-lg leading-relaxed">
+              Streamline operations, increase efficiency, and manage your portfolio with confidence.
+            </p>
+          </div>
+          
+          {/* Features */}
+          <div className="space-y-6">
+            {[
+              {
+                title: 'Financial Management',
+                description: 'Track payments, generate reports, and manage revenue streams'
+              },
+              {
+                title: 'Tenant Relations',
+                description: 'Centralize communications and tenant information'
+              },
+              {
+                title: 'Maintenance Operations',
+                description: 'Monitor requests and coordinate service providers'
+              },
+              {
+                title: 'Analytics & Reporting',
+                description: 'Data-driven insights for informed decision making'
+              }
+            ].map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 + index * 0.1 }}
+                className="border-l-2 border-gray-700 pl-4"
+              >
+                <h3 className="text-white font-medium mb-1">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-400 text-sm">
+                  {feature.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Stats */}
+          <div className="mt-12 pt-8 border-t border-gray-800">
+            <div className="grid grid-cols-3 gap-8 text-center">
+              <div>
+                <div className="text-3xl font-semibold text-white mb-1">10K+</div>
+                <div className="text-sm text-gray-400">Properties</div>
+              </div>
+              <div>
+                <div className="text-3xl font-semibold text-white mb-1">50K+</div>
+                <div className="text-sm text-gray-400">Active Users</div>
+              </div>
+              <div>
+                <div className="text-3xl font-semibold text-white mb-1">99.9%</div>
+                <div className="text-sm text-gray-400">Uptime</div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

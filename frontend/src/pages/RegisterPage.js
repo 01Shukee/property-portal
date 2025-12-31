@@ -98,7 +98,7 @@ const RegisterPage = () => {
           className="cursor-pointer flex items-center justify-center space-x-2 mb-8" 
         >
           <img
-            src="/logo.png"
+            src="/logo (1).png"
             alt="PropertyHub Logo"
             className="h-32 w-auto"
           />
