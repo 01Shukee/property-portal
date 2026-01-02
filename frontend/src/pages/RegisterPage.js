@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 
 const RegisterPage = () => {
@@ -18,6 +19,8 @@ const RegisterPage = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const roles = [
     {
@@ -88,13 +91,16 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 py-12">
-      <div className="w-full max-w-4xl animate-fade-in">
+    <div className="min-h-screen flex items-center justify-center p-4 py-12 bg-gray-50">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-4xl"
+      >
         {/* Logo */}
-        <div 
-          
+        <motion.div 
           whileHover={{ scale: 1.05 }}
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate('/')}
           className="cursor-pointer flex items-center justify-center space-x-2 mb-8" 
         >
           <img
@@ -102,11 +108,11 @@ const RegisterPage = () => {
             alt="PropertyHub Logo"
             className="h-32 w-auto"
           />
-        </div>
+        </motion.div>
 
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-display font-bold text-gray-900 mb-2">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
             Create Your Account
           </h1>
           <p className="text-gray-600">
@@ -114,33 +120,52 @@ const RegisterPage = () => {
           </p>
         </div>
 
-        <div className="card max-w-3xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-3xl mx-auto">
           {/* Error Message */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 animate-slide-down">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700"
+            >
               {error}
-            </div>
+            </motion.div>
           )}
+
+          {/* ✅ NEW: Multiple Roles Warning */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500"
+          >
+            <p className="text-sm text-blue-800">
+              <strong>💡 Tip:</strong> You can have multiple accounts with different roles. 
+              <strong className="block mt-1">⚠️ IMPORTANT: Use the SAME PASSWORD for all your accounts to easily switch between roles!</strong>
+            </p>
+          </motion.div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Role Selection */}
             <div>
-              <label className="label">I am a...</label>
+              <label className="block text-sm font-medium text-gray-700 mb-3">I am a...</label>
               <div className="grid md:grid-cols-3 gap-4">
                 {roles.map((role) => (
-                  <button
+                  <motion.button
                     key={role.value}
                     type="button"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => handleRoleSelect(role.value)}
-                    className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${formData.role === role.value
-                        ? 'border-primary-500 bg-primary-50 shadow-lg scale-105'
-                        : 'border-gray-200 hover:border-primary-300 hover:bg-gray-50'
-                      }`}
+                    className={`p-4 rounded-xl border-2 transition-all text-left ${
+                      formData.role === role.value
+                        ? 'border-gray-900 bg-gray-50 shadow-lg'
+                        : 'border-gray-200 hover:border-gray-400'
+                    }`}
                   >
                     <div className="text-3xl mb-2">{role.icon}</div>
                     <h3 className="font-semibold text-gray-900 mb-1">{role.title}</h3>
                     <p className="text-sm text-gray-600">{role.description}</p>
-                  </button>
+                  </motion.button>
                 ))}
               </div>
             </div>
@@ -148,26 +173,26 @@ const RegisterPage = () => {
             {/* Personal Information */}
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="label">Full Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="input"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                   placeholder="John Doe"
                   required
                 />
               </div>
 
               <div>
-                <label className="label">Phone Number</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
                 <input
                   type="tel"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="input"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                   placeholder="+234 800 000 0000"
                   required
                 />
@@ -175,85 +200,112 @@ const RegisterPage = () => {
             </div>
 
             <div>
-              <label className="label">Email Address</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                 placeholder="you@example.com"
                 required
               />
+              <p className="text-xs text-gray-500 mt-1">
+                📧 You'll receive a verification email after registration
+              </p>
             </div>
 
             <div>
-              <label className="label">Address (Optional)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Address (Optional)</label>
               <input
                 type="text"
                 name="address"
                 value={formData.address}
                 onChange={handleChange}
-                className="input"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                 placeholder="Lagos, Nigeria"
               />
             </div>
 
-            {/* Password */}
+            {/* Password with Toggle */}
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="label">Password</label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="input"
-                  placeholder="••••••••"
-                  minLength="6"
-                  required
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    placeholder="••••••••"
+                    minLength="6"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                  </button>
+                </div>
               </div>
 
               <div>
-                <label className="label">Confirm Password</label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="input"
-                  placeholder="••••••••"
-                  minLength="6"
-                  required
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    placeholder="••••••••"
+                    minLength="6"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+                  </button>
+                </div>
               </div>
             </div>
+
+            <p className="text-xs text-gray-600">
+              Password must be at least 6 characters long
+            </p>
 
             {/* Terms */}
             <div className="flex items-start space-x-2">
               <input
                 type="checkbox"
                 required
-                className="mt-1 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                className="mt-1 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
               />
               <label className="text-sm text-gray-600">
                 I agree to the{' '}
-                <a href="#" className="text-primary-600 hover:text-primary-700 font-medium">
+                <a href="#" className="text-gray-900 hover:text-gray-700 font-medium">
                   Terms of Service
                 </a>{' '}
                 and{' '}
-                <a href="#" className="text-primary-600 hover:text-primary-700 font-medium">
+                <a href="#" className="text-gray-900 hover:text-gray-700 font-medium">
                   Privacy Policy
                 </a>
               </label>
             </div>
 
             {/* Submit Button */}
-            <button
+            <motion.button
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
               type="submit"
               disabled={loading}
-              className="w-full btn btn-primary text-lg"
+              className="w-full bg-gray-900 hover:bg-gray-800 text-white py-3 rounded-lg font-medium transition-colors disabled:opacity-50 text-lg"
             >
               {loading ? (
                 <span className="flex items-center justify-center">
@@ -266,18 +318,18 @@ const RegisterPage = () => {
               ) : (
                 'Create Account'
               )}
-            </button>
+            </motion.button>
           </form>
 
           {/* Login Link */}
           <p className="mt-6 text-center text-gray-600">
             Already have an account?{' '}
-            <Link to="/login" className="text-primary-600 hover:text-primary-700 font-semibold">
+            <Link to="/login" className="text-gray-900 hover:text-gray-700 font-semibold">
               Sign in
             </Link>
           </p>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

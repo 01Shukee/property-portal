@@ -18,6 +18,10 @@ import LeasesPage from './pages/LeasesPage';
 import UnitsPage from './pages/UnitsPage';
 import StatementPage from './pages/StatementPage';
 import AcceptTenantInvitationPage from './pages/AcceptTenantInvitationPage';
+// ✅ NEW: Email verification and password reset pages
+import VerifyEmailPage from './pages/VerifyEmailPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -67,6 +71,11 @@ function AppRoutes() {
       {/* Public Invitation Routes */}
       <Route path="/accept-invitation/:token" element={<AcceptInvitationPage />} />
       <Route path="/accept-tenant-invitation/:token" element={<AcceptTenantInvitationPage />} />
+
+      {/* ✅ NEW: Email Verification & Password Reset Routes (Public) */}
+      <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
       {/* Guest Routes (only accessible when not logged in) */}
       <Route

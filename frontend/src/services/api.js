@@ -70,6 +70,18 @@ export const authAPI = {
     const response = await api.put('/auth/change-password', passwords);
     return response.data;
   },
+
+  // ✅ NEW: Get all accounts for current user's email
+  getMyAccounts: async () => {
+    const response = await api.get('/auth/my-accounts');
+    return response.data;
+  },
+
+  // ✅ NEW: Switch to different role account
+  switchAccount: async (targetRole) => {
+    const response = await api.post('/auth/switch-account', { targetRole });
+    return response.data;
+  },
 };
 
 // Property API calls

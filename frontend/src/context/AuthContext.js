@@ -52,15 +52,33 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Login function
+  // ✅ FIXED: Login function that returns multiple accounts info
   const login = async (credentials) => {
     try {
       setError(null);
       const data = await authAPI.login(credentials);
+      
+      // ✅ NEW: Return multiple accounts info from backend
+      if (data.hasMultipleAccounts && !credentials.role) {
+        // User has multiple accounts but didn't specify role
+        return { 
+          success: true, 
+          hasMultipleAccounts: true,
+          availableRoles: data.availableRoles,
+          needsRoleSelection: true
+        };
+      }
+      
+      // Normal login - save token and user
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       setUser(data.user);
-      return { success: true };
+      
+      return { 
+        success: true,
+        hasMultipleAccounts: data.hasMultipleAccounts,
+        availableRoles: data.availableRoles
+      };
     } catch (err) {
       const message = err.response?.data?.message || 'Login failed';
       setError(message);
@@ -81,6 +99,22 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify(updatedUser));
   };
 
+  // ✅ NEW: Switch account function
+  const switchAccount = async (targetRole) => {
+    try {
+      setError(null);
+      const data = await authAPI.switchAccount(targetRole);
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      setUser(data.user);
+      return { success: true };
+    } catch (err) {
+      const message = err.response?.data?.message || 'Failed to switch account';
+      setError(message);
+      return { success: false, message };
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -89,6 +123,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     updateUser,
+    switchAccount, // ✅ NEW: Export switch account function
     isAuthenticated: !!user,
     isPropertyManager: user?.role === 'property_manager',
     isHomeowner: user?.role === 'homeowner',
